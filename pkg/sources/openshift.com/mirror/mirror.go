@@ -2,7 +2,7 @@
 mirror provides the capability for tools to retrieve files from mirror.openshift.com
 */
 package mirror
-import "fmt"
+
 
 import (
 	"github.com/openshift/backplane-tools/pkg/sources/base/url"
