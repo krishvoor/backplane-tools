@@ -2,13 +2,14 @@
 mirror provides the capability for tools to retrieve files from mirror.openshift.com
 */
 package mirror
+import "fmt"
 
 import (
 	"github.com/openshift/backplane-tools/pkg/sources/base/url"
 )
 
 const (
-	baseURL string = "http://mirror.openshift.com"
+	baseURL string = "https://mirror.openshift.com"
 )
 
 // Source objects retrieve files from a mirror server
@@ -19,6 +20,10 @@ type Source struct {
 
 // NewSource creates a Source
 func NewSource() *Source {
+   
+	// unit test
+	fmt.Println("Mirror URL:", baseURL)
+
 	s := &Source{
 		Source: url.NewSource(baseURL),
 	}
