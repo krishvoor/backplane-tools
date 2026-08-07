@@ -22,7 +22,7 @@ type Source struct {
 func NewSource() *Source {
    
 	// unit test
-	fmt.Println("Mirror URL:", baseURL)
+	// fmt.Println("Mirror URL:", baseURL)
 
 	s := &Source{
 		Source: url.NewSource(baseURL),
