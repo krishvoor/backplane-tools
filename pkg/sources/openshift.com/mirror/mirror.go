@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	baseURL string = "http://mirror.openshift.com"
+	baseURL string = "https://mirror.openshift.com"
 )
 
 // Source objects retrieve files from a mirror server
@@ -22,5 +22,6 @@ func NewSource() *Source {
 	s := &Source{
 		Source: url.NewSource(baseURL),
 	}
+
 	return s
 }
