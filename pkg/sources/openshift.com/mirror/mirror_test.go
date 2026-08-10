@@ -31,3 +31,14 @@ func TestBaseURLUsesHTTPS(t *testing.T) {
 		t.Errorf("baseURL scheme is not https: got %s", parsedURL.Scheme)
 	}
 }
+
+
+// TestBaseURL verifies that the mirror source points to the expected endpoints.
+func TestBaseURL(t *testing.T) {
+	 const expectedBaseURL = "https://mirror.openshift.com"
+
+     if baseURL != expectedBaseURL {
+		 t.Errorf("expected baseURL %q, got %q", expectedBaseURL, baseURL)
+	 }
+
+}
