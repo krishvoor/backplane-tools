@@ -7,6 +7,7 @@ import (
 
 // The test is to verify that NewSource correctly intializes the mirror source.
 func TestNewSource(t *testing.T) {
+	t.Parallel()
 	s := NewSource()
 
 	if s == nil {
@@ -21,8 +22,8 @@ func TestNewSource(t *testing.T) {
 // TestBaseURLUsesHTTPS is a security regression test that ensures the mirror.
 // endpoint always uses HTTPS instead of an insecure HTTP connection.
 func TestBaseURLUsesHTTPS(t *testing.T) {
+	t.Parallel()
 	parsedURL, err := url.Parse(baseURL)
-
 	if err != nil {
 		t.Fatalf("failed to parse baseURL: %v", err)
 	}
@@ -32,13 +33,12 @@ func TestBaseURLUsesHTTPS(t *testing.T) {
 	}
 }
 
-
 // TestBaseURL verifies that the mirror source points to the expected endpoints.
 func TestBaseURL(t *testing.T) {
-	 const expectedBaseURL = "https://mirror.openshift.com"
+	t.Parallel()
+	const expectedBaseURL = "https://mirror.openshift.com"
 
-     if baseURL != expectedBaseURL {
-		 t.Errorf("expected baseURL %q, got %q", expectedBaseURL, baseURL)
-	 }
-
+	if baseURL != expectedBaseURL {
+		t.Errorf("expected baseURL %q, got %q", expectedBaseURL, baseURL)
+	}
 }
