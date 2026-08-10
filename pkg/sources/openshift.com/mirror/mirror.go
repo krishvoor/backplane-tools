@@ -22,5 +22,6 @@ func NewSource() *Source {
 	s := &Source{
 		Source: url.NewSource(baseURL),
 	}
+
 	return s
 }
