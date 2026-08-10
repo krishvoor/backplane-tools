@@ -3,7 +3,6 @@ mirror provides the capability for tools to retrieve files from mirror.openshift
 */
 package mirror
 
-
 import (
 	"github.com/openshift/backplane-tools/pkg/sources/base/url"
 )
@@ -20,9 +19,6 @@ type Source struct {
 
 // NewSource creates a Source
 func NewSource() *Source {
-   
-	// unit test
-	// fmt.Println("Mirror URL:", baseURL)
 
 	s := &Source{
 		Source: url.NewSource(baseURL),
