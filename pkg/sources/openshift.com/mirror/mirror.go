@@ -19,7 +19,6 @@ type Source struct {
 
 // NewSource creates a Source
 func NewSource() *Source {
-
 	s := &Source{
 		Source: url.NewSource(baseURL),
 	}
