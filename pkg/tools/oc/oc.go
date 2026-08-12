@@ -1,6 +1,7 @@
 package oc
 
 import (
+	"bytes"
 	"fmt"
 	"net/url"
 	"os"
@@ -62,8 +63,14 @@ func (t *Tool) Install() error {
 		return fmt.Errorf("failed to update file mode for %s: %w", clientArchiveFilePath, err)
 	}
 
-	// Download latest checksum file
-	checksumSlug, err := url.JoinPath(t.BaseSlug, "sha256sum.txt")
+	// Download the GPG-signed checksum file rather than the plaintext sha256sum.txt.
+	// mirror.openshift.com serves both the client archive and its checksums over the
+	// same HTTPS connection, so an adjacent-network or proxying attacker able to tamper
+	// with one in transit could just as easily tamper with the other, defeating a
+	// checksum comparison alone. Verifying sha256sum.txt.gpg against a pinned Red Hat
+	// release key - rather than a key fetched over the network - anchors integrity to a
+	// trust root that doesn't depend on the transport used to fetch the artifacts.
+	checksumSlug, err := url.JoinPath(t.BaseSlug, "sha256sum.txt.gpg")
 	if err != nil {
 		return fmt.Errorf("failed to build checksum URL: %w", err)
 	}
@@ -73,7 +80,12 @@ func (t *Tool) Install() error {
 		return fmt.Errorf("failed to download checksum file %s: %w", checksumSlug, err)
 	}
 
-	checksum, err := t.extractChecksumFromFile(checksumFilePath, clientArchiveName)
+	verifiedChecksumData, err := utils.VerifyAndExtractSignedMessage(checksumFilePath, utils.RedHatReleaseKey2ArmoredPublicKey)
+	if err != nil {
+		return fmt.Errorf("failed to verify GPG signature on checksum file %s: %w", checksumFilePath, err)
+	}
+
+	checksum, err := t.extractChecksumFromBytes(verifiedChecksumData, clientArchiveName)
 	if err != nil {
 		return fmt.Errorf("failed to retrieve checksum from file %s: %w", checksumFilePath, err)
 	}
@@ -115,8 +127,8 @@ func (t *Tool) Install() error {
 	return nil
 }
 
-func (t *Tool) extractChecksumFromFile(checksumFile, searchPattern string) (string, error) {
-	line, err := utils.GetLineInFileMatchingKey(checksumFile, searchPattern)
+func (t *Tool) extractChecksumFromBytes(checksumData []byte, searchPattern string) (string, error) {
+	line, err := utils.GetLineInReaderMatchingKey(bytes.NewReader(checksumData), searchPattern)
 	if err != nil {
 		return "", err
 	}
