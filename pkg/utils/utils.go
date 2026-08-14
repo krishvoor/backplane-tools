@@ -98,15 +98,16 @@ func GetLineInReaderMatchingKey(reader io.Reader, key string) (string, error) {
 
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
-		if scanner.Err() != nil {
-			return "", fmt.Errorf("failed to read line: %w", scanner.Err())
-		}
 		line := scanner.Text()
-
 		match := r.FindStringSubmatch(line)
+
 		if len(match) > 0 {
 			return line, nil
 		}
+	}
+
+	if scanErr := scanner.Err(); scanErr != nil {
+		return "", fmt.Errorf("failed to read line: %w", scanErr)
 	}
 
 	return "", errors.New("no match found")
@@ -118,15 +119,17 @@ func GetLineInReaderMatchingKey(reader io.Reader, key string) (string, error) {
 func GetLineInReader(reader io.Reader, match string) (res string, err error) {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
-		if scanner.Err() != nil {
-			return "", fmt.Errorf("failed to read line: %w", err)
-		}
 		line := scanner.Text()
 
 		if strings.Contains(line, match) {
 			return line, nil
 		}
 	}
+
+	if scanErr := scanner.Err(); scanErr != nil {
+		return "", fmt.Errorf("failed to read line: %w", scanErr)
+	}
+
 	return "", fmt.Errorf("failed to find matching line for search pattern: '%s'", match)
 }
 
