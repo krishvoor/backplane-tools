@@ -82,22 +82,32 @@ func GetLineInFileMatchingKey(filepath string, key string) (res string, err erro
 		}
 	}()
 
+	return GetLineInReaderMatchingKey(file, key)
+}
+
+// GetLineInReaderMatchingKey searches the provided reader for a line that contains the
+// provided key. A key is a pattern that will be either at the begin/end of line and
+// will have ::spaces:: characters around.
+// If a match is found, the entire line is returned.
+// Only the first result is returned. If no lines match, an error is returned
+func GetLineInReaderMatchingKey(reader io.Reader, key string) (string, error) {
 	r, err := regexp.Compile("(^|\\s)" + key + "($|\\s)")
 	if err != nil {
 		return "", err
 	}
 
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
-		if scanner.Err() != nil {
-			return "", fmt.Errorf("failed to read line: %w", err)
-		}
 		line := scanner.Text()
-
 		match := r.FindStringSubmatch(line)
+
 		if len(match) > 0 {
 			return line, nil
 		}
+	}
+
+	if scanErr := scanner.Err(); scanErr != nil {
+		return "", fmt.Errorf("failed to read line: %w", scanErr)
 	}
 
 	return "", errors.New("no match found")
@@ -109,15 +119,17 @@ func GetLineInFileMatchingKey(filepath string, key string) (res string, err erro
 func GetLineInReader(reader io.Reader, match string) (res string, err error) {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
-		if scanner.Err() != nil {
-			return "", fmt.Errorf("failed to read line: %w", err)
-		}
 		line := scanner.Text()
 
 		if strings.Contains(line, match) {
 			return line, nil
 		}
 	}
+
+	if scanErr := scanner.Err(); scanErr != nil {
+		return "", fmt.Errorf("failed to read line: %w", scanErr)
+	}
+
 	return "", fmt.Errorf("failed to find matching line for search pattern: '%s'", match)
 }
 
